@@ -1,5 +1,9 @@
 # 自动手势 / AutoHand
 
+<p align="center">
+  <img src="design/logo-master-1024.png" width="128" alt="自动手势 logo">
+</p>
+
 一个 Android 手势自动回放工具：把你在屏幕上滑过、点过的手势录下来，之后按设定的循环和间隔自动重放。适合刷视频、翻页这类需要反复上滑的场景。
 
 - 无需 Root、无需电脑，纯无障碍服务实现
