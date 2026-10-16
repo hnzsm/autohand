@@ -5,6 +5,9 @@ on:
     branches: [main, master]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   apk:
     runs-on: ubuntu-latest
@@ -26,3 +29,13 @@ jobs:
           name: AutoHand-debug-apk
           path: app/build/outputs/apk/debug/AutoHand-debug.apk
           if-no-files-found: error
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: AutoHand v1.0.${{ github.run_number }}
+          body: 自动构建的 debug 包。安装后到无障碍里开启「自动手势」即可使用。
+          files: app/build/outputs/apk/debug/AutoHand-debug.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
