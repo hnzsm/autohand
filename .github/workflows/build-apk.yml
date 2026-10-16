@@ -3,6 +3,11 @@ name: build-apk
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "design/**"
+      - "LICENSE"
   workflow_dispatch:
 
 permissions:
@@ -33,9 +38,12 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: AutoHand v1.0.${{ github.run_number }}
-          body: 自动构建的 debug 包。安装后到无障碍里开启「自动手势」即可使用。
+          tag_name: latest
+          name: AutoHand 最新构建
+          body: |
+            自动构建的 debug 包。安装后到无障碍里开启「自动手势」即可使用。
+            对应提交：${{ github.sha }}
           files: app/build/outputs/apk/debug/AutoHand-debug.apk
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -6,7 +6,7 @@
 - 悬浮球 + 悬浮控制面板，全程在目标应用里操作，不用来回切 App
 - 不联网、无任何网络权限，脚本和设置只存本机
 
-**下载**：<https://github.com/hnzsm/autohand/releases/latest>（每次推送到 main 自动构建并发 Release）
+**下载**：<https://github.com/hnzsm/autohand/releases/latest>（固定直链：<https://github.com/hnzsm/autohand/releases/download/latest/AutoHand-debug.apk>）
 
 ---
 
@@ -126,7 +126,7 @@
 
 ## 自动构建
 
-推送到 `main` 会触发 [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml)：构建 debug APK → 上传 artifact `AutoHand-debug-apk` → 自动创建 Release（`v1.0.<构建号>`）并附上 `AutoHand-debug.apk`。使用工作流自带的 `GITHUB_TOKEN`，不需要额外配置密钥。
+推送到 `main` 会触发 [`.github/workflows/build-apk.yml`](.github/workflows/build-apk.yml)：构建 debug APK → 上传 artifact `AutoHand-debug-apk` → 更新固定 Release `latest`（附件始终叫 `AutoHand-debug.apk`，下载地址永不变）。只改文档（`*.md`、`docs/`、`design/`、`LICENSE`）的推送不会触发构建。使用工作流自带的 `GITHUB_TOKEN`，不需要额外配置密钥。
 
 ---
 
