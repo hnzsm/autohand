@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AutoHand</string>
+    <string name="btn_open_accessibility_hint">Find \"AutoHand\" in the list and turn it on</string>
+</resources>

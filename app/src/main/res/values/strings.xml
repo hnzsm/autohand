@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">自动手势</string>
+
+    <string name="accessibility_description">开启后，本应用可以在其他应用之上显示悬浮球，并按你录制的手势自动滑动或点击屏幕。不会读取或上传任何页面内容。</string>
+
+    <string name="status_service_on">无障碍服务已开启</string>
+    <string name="status_service_off">无障碍服务未开启</string>
+    <string name="btn_open_accessibility">去开启无障碍</string>
+    <string name="btn_open_accessibility_hint">在列表里找到「自动手势」，打开开关</string>
+    <string name="status_hint_on">可以显示悬浮球了：点球 →「录制」，在屏幕上滑一次即可保存成脚本</string>
+
+    <string name="switch_ball">显示悬浮球</string>
+    <string name="switch_keep_screen_on">运行时保持屏幕常亮</string>
+    <string name="switch_keep_screen_on_hint">息屏后手势会全部失效，刷视频建议开启</string>
+
+    <string name="section_scripts">手势脚本</string>
+    <string name="btn_add_manual">新建空白脚本</string>
+    <string name="empty_scripts">还没有脚本。开启悬浮球后，点球 →「录制」，在屏幕上滑一次即可保存。</string>
+
+    <string name="ball_show">显示球</string>
+    <string name="ball_hide">隐藏球</string>
+
+    <string name="panel_record">录制</string>
+    <string name="panel_stop_record">停止录制</string>
+    <string name="panel_start">开始</string>
+    <string name="panel_pause">暂停</string>
+    <string name="panel_resume">继续</string>
+    <string name="panel_stop">停止</string>
+    <string name="panel_more">脚本/设置</string>
+
+    <string name="record_hint">在屏幕上完成一次手势，抬手后自动记录</string>
+    <string name="record_again">再录一段</string>
+    <string name="record_save">保存脚本</string>
+    <string name="record_cancel">放弃</string>
+
+    <string name="loop_times_infinite">无限</string>
+    <string name="notify_running">%1$s · 第 %2$s 轮</string>
+    <string name="notify_channel_name">运行状态</string>
+</resources>

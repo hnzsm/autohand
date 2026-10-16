@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ballRoot"
+    android:layout_width="52dp"
+    android:layout_height="52dp"
+    android:background="@drawable/bg_ball">
+
+    <TextView
+        android:id="@+id/ballIcon"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="▶"
+        android:textColor="@color/panel_text"
+        android:textSize="18sp" />
+</FrameLayout>

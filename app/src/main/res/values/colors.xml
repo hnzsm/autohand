@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ball_idle">#B3222222</color>
+    <color name="ball_running">#B312B76A</color>
+    <color name="ball_paused">#B3F59E0B</color>
+    <color name="panel_bg">#F21C1C1E</color>
+    <color name="panel_text">#FFFFFFFF</color>
+    <color name="panel_text_dim">#B3FFFFFF</color>
+    <color name="accent">#FF12B76A</color>
+    <color name="record_overlay">#40000000</color>
+</resources>
