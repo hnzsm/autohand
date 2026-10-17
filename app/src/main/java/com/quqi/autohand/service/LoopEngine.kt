@@ -37,13 +37,29 @@ class LoopEngine(service: AccessibilityService) {
 
     private val remainingMs = AtomicLong(0)
 
+    @Volatile
+    private var touchHeld = false
+
+    @Volatile
+    private var inWait = false
+
     /** 距离下一次手势还有多少毫秒；正在执行手势或已暂停时为 0，供悬浮球倒计时。 */
     fun remainingWaitMs(): Long = remainingMs.get().coerceAtLeast(0L)
+
+    /**
+     * 真手按在屏幕上时冻住等待倒计时，抬手继续。
+     * 只在等待阶段接受「按下」，避免手势注入期间的触摸事件把倒计时误冻。
+     */
+    fun setTouchHeld(held: Boolean) {
+        if (held && !inWait) return
+        touchHeld = held
+    }
 
     fun start(script: Script, loops: Int, gapMs: Long, jitterMs: Long) {
         job?.cancel()
         if (script.steps.isEmpty()) return
         paused = false
+        touchHeld = false
         state = State.RUNNING
         round = 0
         onChange?.invoke(state, round)
@@ -87,6 +103,7 @@ class LoopEngine(service: AccessibilityService) {
         job?.cancel()
         remainingMs.set(0)
         paused = false
+        touchHeld = false
         if (state != State.IDLE) {
             state = State.IDLE
             onChange?.invoke(state, round)
@@ -103,20 +120,34 @@ class LoopEngine(service: AccessibilityService) {
     }
 
     private suspend fun sleepInterruptible(ms: Long) {
-        var left = ms
-        while (left > 0) {
-            if (!isActiveGate()) {
-                remainingMs.set(0)
-                return
+        inWait = true
+        try {
+            var left = ms
+            while (left > 0) {
+                if (!isActiveGate()) {
+                    remainingMs.set(0)
+                    return
+                }
+                // 暂停时 left 不递减，倒计时自然停住
+                awaitRunning()
+                // 真手按屏期间同样停住，抬手后从剩下的时间继续
+                while (touchHeld) {
+                    if (!isActiveGate()) {
+                        remainingMs.set(0)
+                        return
+                    }
+                    remainingMs.set(left)
+                    delay(GATE_TICK)
+                }
+                remainingMs.set(left)
+                val slice = minOf(left, GATE_TICK)
+                delay(slice)
+                left -= slice
             }
-            // 暂停时 left 不递减，倒计时自然停住
-            awaitRunning()
-            remainingMs.set(left)
-            val slice = minOf(left, GATE_TICK)
-            delay(slice)
-            left -= slice
+            remainingMs.set(0)
+        } finally {
+            inWait = false
         }
-        remainingMs.set(0)
     }
 
     companion object {

@@ -43,8 +43,11 @@ object Prefs {
     fun gapMs(c: Context) = sp(c).getLong(KEY_GAP, DEFAULT_GAP_MS)
     fun setGapMs(c: Context, v: Long) = sp(c).edit().putLong(KEY_GAP, v).apply()
 
-    fun jitterEnabled(c: Context) = sp(c).getBoolean(KEY_JITTER, true)
-    fun setJitter(c: Context, v: Boolean) = sp(c).edit().putBoolean(KEY_JITTER, v).apply()
+    fun jitterMs(c: Context) = sp(c).getLong(KEY_JITTER, DEFAULT_JITTER_MS)
+    fun setJitterMs(c: Context, v: Long) = sp(c).edit().putLong(KEY_JITTER, v).apply()
+
+    fun privacyConsented(c: Context) = sp(c).getBoolean(KEY_CONSENT, false)
+    fun setPrivacyConsented(c: Context, v: Boolean) = sp(c).edit().putBoolean(KEY_CONSENT, v).apply()
 
     fun ballX(c: Context) = sp(c).getInt(KEY_BALL_X, 0)
     fun ballY(c: Context) = sp(c).getInt(KEY_BALL_Y, 240)
@@ -58,6 +61,7 @@ object Prefs {
     private const val KEY_LOOP = "loop_count"
     private const val KEY_GAP = "gap_ms"
     private const val KEY_JITTER = "jitter"
+    private const val KEY_CONSENT = "privacy_consented"
     private const val KEY_BALL_X = "ball_x"
     private const val KEY_BALL_Y = "ball_y"
 
@@ -66,4 +70,10 @@ object Prefs {
     const val GAP_STEP_MS = 2000L
     const val GAP_MIN_MS = 0L
     const val GAP_MAX_MS = 60000L
+
+    /** 随机抖动：在间隔之上最多再叠加的随机量（毫秒），0 表示不抖动。 */
+    const val DEFAULT_JITTER_MS = 3000L
+    const val JITTER_STEP_MS = 200L
+    const val JITTER_MIN_MS = 0L
+    const val JITTER_MAX_MS = 10000L
 }

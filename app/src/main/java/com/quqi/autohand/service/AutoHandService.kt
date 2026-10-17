@@ -1,6 +1,7 @@
 package com.quqi.autohand.service
 
 import android.accessibilityservice.AccessibilityService
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -9,6 +10,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
+import android.view.MotionEvent
 import android.view.accessibility.AccessibilityEvent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -43,12 +45,21 @@ class AutoHandService : AccessibilityService() {
             Prefs.setGapMs(this@AutoHandService, (Prefs.gapMs(this@AutoHandService) + delta * Prefs.GAP_STEP_MS).coerceIn(Prefs.GAP_MIN_MS, Prefs.GAP_MAX_MS))
             refreshUi()
         }
-        onJitterToggle = {
-            Prefs.setJitter(this@AutoHandService, !Prefs.jitterEnabled(this@AutoHandService))
+        onJitterDelta = { delta ->
+            Prefs.setJitterMs(
+                this@AutoHandService,
+                (Prefs.jitterMs(this@AutoHandService) + delta * Prefs.JITTER_STEP_MS)
+                    .coerceIn(Prefs.JITTER_MIN_MS, Prefs.JITTER_MAX_MS)
+            )
             refreshUi()
         }
         onScriptDelta = { delta -> stepScript(delta) }
         onClose = { panel?.close() }
+        // 点面板外面（比如悬浮球）会先触发这里关闭；记下时刻，避免球的点击又把面板开回来
+        onOutsideTouch = {
+            outsideCloseAt = android.os.SystemClock.uptimeMillis()
+            panel?.close()
+        }
     }
 
     override fun onServiceConnected() {
@@ -61,11 +72,42 @@ class AutoHandService : AccessibilityService() {
         recorder = RecordController(this)
         trail = TrailController(this)
         createChannel()
+        listenTouchInteraction()
         if (Prefs.ballEnabled(this)) ball?.show(::onBallClick)
         Log.i(TAG, "无障碍服务已连接，悬浮球=" + Prefs.ballEnabled(this))
     }
 
-    override fun onAccessibilityEvent(event: AccessibilityEvent?) = Unit
+    /**
+     * XML 配置里没订触摸事件，这里补上：真手按屏时要把轮间倒计时冻住。
+     * TYPE_TOUCH_INTERACTION_* 是 Android 10 才有的，低版本申请不到就自动退回不冻。
+     */
+    private fun listenTouchInteraction() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return
+        runCatching {
+            serviceInfo = serviceInfo.apply {
+                eventTypes = eventTypes or
+                    AccessibilityEvent.TYPE_TOUCH_INTERACTION_START or
+                    AccessibilityEvent.TYPE_TOUCH_INTERACTION_END
+                // Android 14 起真手触摸走 onMotionEvent，需要这个 flag 才下发
+                flags = flags or AccessibilityServiceInfo.FLAG_SEND_MOTION_EVENTS
+            }
+        }
+    }
+
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+        when (event?.eventType) {
+            AccessibilityEvent.TYPE_TOUCH_INTERACTION_START -> engine?.setTouchHeld(true)
+            AccessibilityEvent.TYPE_TOUCH_INTERACTION_END -> engine?.setTouchHeld(false)
+        }
+    }
+
+    /** Android 14 起真手触摸走 onMotionEvent，需要 FLAG_SEND_MOTION_EVENTS 才下发。 */
+    override fun onMotionEvent(event: MotionEvent) {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> engine?.setTouchHeld(true)
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> engine?.setTouchHeld(false)
+        }
+    }
 
     override fun onInterrupt() = Unit
 
@@ -95,8 +137,14 @@ class AutoHandService : AccessibilityService() {
         }
     }
 
+    private var outsideCloseAt = 0L
+
     private fun onBallClick() {
         val p = panel ?: return
+        if (android.os.SystemClock.uptimeMillis() - outsideCloseAt < OUTSIDE_CLOSE_GUARD_MS) {
+            outsideCloseAt = 0L
+            return
+        }
         if (p.isShowing) {
             p.close()
         } else {
@@ -168,9 +216,7 @@ class AutoHandService : AccessibilityService() {
 
     private fun gapMs(): Long = Prefs.gapMs(this)
 
-    private fun jitterMs(): Long =
-        if (!Prefs.jitterEnabled(this)) 0L
-        else (gapMs() * 0.3f).toLong().coerceIn(MIN_JITTER, MAX_JITTER)
+    private fun jitterMs(): Long = Prefs.jitterMs(this)
 
     private fun onRound(e: LoopEngine, round: Int) {
         if (e.state == LoopEngine.State.IDLE) {
@@ -194,7 +240,6 @@ class AutoHandService : AccessibilityService() {
             loops = Prefs.loopCount(this),
             gapMs = gapMs(),
             jitterMs = jitterMs(),
-            jitterOn = Prefs.jitterEnabled(this),
             scriptCount = Prefs.readScripts(this).size
         )
     }
@@ -240,8 +285,7 @@ class AutoHandService : AccessibilityService() {
         private const val TAG = "AutoHandService"
         private const val CHANNEL = "run_state"
         private const val NOTIFY_ID = 1001
-        private const val MIN_JITTER = 300L
-        private const val MAX_JITTER = 5000L
+        private const val OUTSIDE_CLOSE_GUARD_MS = 800L
         const val ACTION_CONTROL = "com.quqi.autohand.action.CONTROL"
         const val EXTRA_ACTION = "action"
         const val ACT_PAUSE = "pause"

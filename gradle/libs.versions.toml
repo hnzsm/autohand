@@ -8,6 +8,9 @@ material = "1.11.0"
 recyclerview = "1.1.0"
 lifecycle = "2.7.0"
 
+umeng-common = "+"
+umeng-asms = "+"
+umeng-apm = "+"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -16,6 +19,9 @@ androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecyc
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
+umeng-common = { module = "com.umeng.umsdk:common", version.ref = "umeng-common" }
+umeng-asms = { module = "com.umeng.umsdk:asms", version.ref = "umeng-asms" }
+umeng-apm = { module = "com.umeng.umsdk:apm", version.ref = "umeng-apm" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

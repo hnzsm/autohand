@@ -2,4 +2,43 @@
 <resources>
     <string name="app_name">AutoHand</string>
     <string name="btn_open_accessibility_hint">Find \"AutoHand\" in the list and turn it on</string>
+
+    <string name="settings">Settings</string>
+    <string name="settings_section_privacy">Privacy &amp; compliance</string>
+    <string name="settings_privacy">Privacy policy</string>
+    <string name="settings_privacy_sub">What we collect, what we don\'t, how to opt out</string>
+    <string name="settings_permissions">Permission usage</string>
+    <string name="settings_permissions_sub">Why accessibility, overlay, notification and network are needed</string>
+    <string name="settings_section_update">Updates</string>
+    <string name="settings_check_update">Check for updates</string>
+    <string name="settings_check_update_sub">Look for a newer build on GitHub Releases</string>
+    <string name="settings_section_about">About</string>
+    <string name="settings_version">Current version</string>
+    <string name="settings_disclaimer">Usage disclaimer</string>
+    <string name="settings_disclaimer_sub">Automation risk is borne by the user</string>
+    <string name="settings_repo">Project home</string>
+
+    <string name="update_checking">Checking…</string>
+    <string name="update_latest">You\'re up to date</string>
+    <string name="update_latest_msg">Current %1$s. No newer release found.</string>
+    <string name="update_found">New version %1$s available</string>
+    <string name="update_found_msg">Current %1$s, latest release %2$s. Tap \"Download\" to get it from the release page.</string>
+    <string name="update_go">Download</string>
+    <string name="update_fail">Check failed</string>
+    <string name="update_fail_msg">Cannot reach the release API (%1$s). Try again later or visit the release page.</string>
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Cancel</string>
+
+    <string name="consent_title">Privacy &amp; third-party SDK notice</string>
+    <string name="consent_msg">Before you start, a quick note:\n\nThe core feature (recording and replaying gestures) works fully offline; scripts and settings stay on this device.\n\nTo understand usage and crashes, the app integrates Umeng analytics and performance monitoring. It only initializes after you tap \"Agree &amp; continue\", and collects: launch counts, device model and OS version, network type, crash and jank stacks. It never collects script content, contacts, SMS, photos or precise location.\n\nTap \"Basic features only\" to skip all reporting; recording and replay keep working. The full policy is always available in Settings.</string>
+    <string name="consent_agree">Agree &amp; continue</string>
+    <string name="consent_deny">Basic features only</string>
+    <string name="consent_view">View privacy policy</string>
+
+    <string name="privacy_title">Privacy policy</string>
+    <string name="privacy_text">Effective date: 2026-10-17\n\n1. What we collect and why\n1.1 Local data: your recorded gesture scripts, script names, loop counts, intervals and jitter settings are stored only on this device (SharedPreferences file auto_hand). They are never uploaded or synced.\n1.2 Analytics and performance monitoring (Umeng U-App / U-APM): initialized only after you consent. Collected: launch counts, new devices, channel, app version, OS version, device model and vendor, network type, approximate region inferred from IP, plus crash / ANR stacks, launch duration, page jank, memory and network performance samples. Used to understand usage and locate crashes.\n\n2. What we never collect\nScript content, clipboard, contacts, SMS, call logs, photos and precise location are never read or uploaded.\n\n3. Third-party SDKs\nUmeng SDK (com.umeng.umsdk): collects the analytics and performance data above. Its privacy policy: https://www.umeng.com/policy .\n\n4. Permissions\nSee \"Permission usage\" in Settings.\n\n5. Your choices\nRevoke network access for this app in system settings to stop all reporting; uninstalling deletes all local data.\n\n6. Contact\nOpen an issue at https://github.com/hnzsm/autohand .</string>
+    <string name="permissions_title">Permission usage</string>
+    <string name="permissions_text">Accessibility service: records your gesture trails and injects the same gestures during replay. This is the core capability; the app cannot work without it.\n\nOverlay windows (granted with accessibility): floating ball, control panel, recording hint and replay trail.\n\nNotifications (Android 13+): an ongoing notification (\"round N\") while replaying, so the service is not killed by the system.\n\nNetwork (INTERNET / ACCESS_NETWORK_STATE / ACCESS_WIFI_STATE): only for Umeng reporting and update checks. Recording and replay do not need network and work offline.</string>
+    <string name="disclaimer_title">Usage disclaimer</string>
+    <string name="disclaimer_text">Use only on your own devices and in apps you are allowed to operate. Automated bulk operations may violate the target platform\'s terms of service; any account or legal risk is borne by the user.</string>
 </resources>

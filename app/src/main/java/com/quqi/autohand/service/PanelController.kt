@@ -27,9 +27,10 @@ class PanelController(private val service: AccessibilityService) {
         var onPause: () -> Unit = {}
         var onLoopDelta: (Int) -> Unit = {}
         var onGapDelta: (Int) -> Unit = {}
-        var onJitterToggle: () -> Unit = {}
+        var onJitterDelta: (Int) -> Unit = {}
         var onScriptDelta: (Int) -> Unit = {}
         var onClose: () -> Unit = {}
+        var onOutsideTouch: () -> Unit = {}
     }
 
     private val wm = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
@@ -62,7 +63,7 @@ class PanelController(private val service: AccessibilityService) {
         bindEvents(view, listener)
         view.root.setOnTouchListener { _, event ->
             if (event.actionMasked == MotionEvent.ACTION_OUTSIDE) {
-                listener.onClose()
+                listener.onOutsideTouch()
                 true
             } else {
                 false
@@ -87,7 +88,6 @@ class PanelController(private val service: AccessibilityService) {
         loops: Int,
         gapMs: Long,
         jitterMs: Long,
-        jitterOn: Boolean,
         scriptCount: Int
     ) {
         val b = binding ?: return
@@ -104,7 +104,8 @@ class PanelController(private val service: AccessibilityService) {
         }
         b.valueLoop.text = if (loops <= 0) service.getString(com.quqi.autohand.R.string.loop_times_infinite) else "$loops"
         b.valueGap.text = if (gapMs <= 0) "无" else "${gapMs / 1000}s"
-        b.valueJitter.text = if (!jitterOn) "关闭" else "±${jitterMs / 1000.0}s"
+        b.valueJitter.text =
+            if (jitterMs <= 0) "无" else String.format(java.util.Locale.US, "±%.1fs", jitterMs / 1000.0)
     }
 
     private fun bindEvents(b: ViewPanelBinding, l: Listener) {
@@ -122,7 +123,10 @@ class PanelController(private val service: AccessibilityService) {
         b.btnGapPlus.setOnClickListener { if (!suppressClick) l.onGapDelta(1) }
         bindHoldRepeat(b.btnGapMinus) { l.onGapDelta(-1) }
         bindHoldRepeat(b.btnGapPlus) { l.onGapDelta(1) }
-        b.valueJitter.setOnClickListener { l.onJitterToggle() }
+        b.btnJitterMinus.setOnClickListener { if (!suppressClick) l.onJitterDelta(-1) }
+        b.btnJitterPlus.setOnClickListener { if (!suppressClick) l.onJitterDelta(1) }
+        bindHoldRepeat(b.btnJitterMinus) { l.onJitterDelta(-1) }
+        bindHoldRepeat(b.btnJitterPlus) { l.onJitterDelta(1) }
         b.btnPrevScript.setOnClickListener { l.onScriptDelta(-1) }
         b.btnNextScript.setOnClickListener { l.onScriptDelta(1) }
         b.btnHidePanel.setOnClickListener { l.onClose() }

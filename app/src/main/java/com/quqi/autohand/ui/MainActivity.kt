@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.quqi.autohand.R
+import com.quqi.autohand.UmengInit
 import com.quqi.autohand.databinding.ActivityMainBinding
 import com.quqi.autohand.model.Script
 import com.quqi.autohand.service.AutoHandService
@@ -35,12 +37,35 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnAccessibility.setOnClickListener { openAccessibilitySettings() }
         binding.btnNewScript.setOnClickListener { createBlank() }
+        binding.btnSettings.setOnClickListener { startActivity(Intent(this, SettingsActivity::class.java)) }
+
+        if (!Prefs.privacyConsented(this)) showConsent()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) !=
             android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
+    }
+
+    /** 首启隐私告知：同意后才初始化友盟 SDK，拒绝则完全不上报。 */
+    private fun showConsent() {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle(R.string.consent_title)
+            .setMessage(R.string.consent_msg)
+            .setPositiveButton(R.string.consent_agree) { _, _ ->
+                Prefs.setPrivacyConsented(this, true)
+                UmengInit.start(this)
+            }
+            .setNegativeButton(R.string.consent_deny) { _, _ -> }
+            .setNeutralButton(R.string.consent_view, null)
+            .setCancelable(false)
+            .create()
+        dialog.show()
+        // 中性按钮默认会关掉弹框，这里改成只打开政策全文、保留选择
+        dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+            PolicyDialogs.showPrivacy(this)
         }
     }
 

@@ -192,13 +192,30 @@
             android:textSize="12sp" />
 
         <TextView
-            android:id="@+id/valueJitter"
-            android:layout_width="96dp"
+            android:id="@+id/btnJitterMinus"
+            android:layout_width="32dp"
             android:layout_height="32dp"
             android:background="@drawable/bg_chip"
             android:gravity="center"
+            android:text="−"
+            android:textColor="@color/panel_text" />
+
+        <TextView
+            android:id="@+id/valueJitter"
+            android:layout_width="64dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:textColor="@color/panel_text"
             android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/btnJitterPlus"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/bg_chip"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="@color/panel_text" />
     </LinearLayout>
 
     <TextView

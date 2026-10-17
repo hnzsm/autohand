@@ -29,6 +29,12 @@ jobs:
       - name: Build debug APK
         run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon --stacktrace
 
+      - name: Read version
+        id: ver
+        run: |
+          echo "code=$(grep -oP 'versionCode = \K[0-9]+' app/build.gradle.kts)" >> "$GITHUB_OUTPUT"
+          echo "name=$(grep -oP 'versionName = "\K[^"]+' app/build.gradle.kts)" >> "$GITHUB_OUTPUT"
+
       - uses: actions/upload-artifact@v4
         with:
           name: AutoHand-debug-apk
@@ -43,6 +49,7 @@ jobs:
           body: |
             自动构建的 debug 包。安装后到无障碍里开启「自动手势」即可使用。
             对应提交：${{ github.sha }}
+            versionCode=${{ steps.ver.outputs.code }} versionName=${{ steps.ver.outputs.name }}
           files: app/build/outputs/apk/debug/AutoHand-debug.apk
           make_latest: true
         env:
