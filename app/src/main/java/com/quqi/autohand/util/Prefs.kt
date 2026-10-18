@@ -20,6 +20,15 @@ object Prefs {
 
     fun nextScriptName(c: Context): String = "脚本 ${readScripts(c).size + 1}"
 
+    /** 改某个脚本的「每轮随机抽一段」开关。 */
+    fun setScriptRandomPick(c: Context, id: String, v: Boolean) {
+        val list = readScripts(c)
+        val target = list.firstOrNull { it.id == id } ?: return
+        if (target.randomPick == v) return
+        target.randomPick = v
+        writeScripts(c, list)
+    }
+
     fun selectedId(c: Context): String? = sp(c).getString(KEY_SELECTED, null)
 
     fun setSelected(c: Context, id: String) = sp(c).edit().putString(KEY_SELECTED, id).apply()

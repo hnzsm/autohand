@@ -15,6 +15,7 @@
     <string name="switch_keep_screen_on_hint">息屏后手势会全部失效，刷视频建议开启</string>
 
     <string name="section_scripts">手势脚本</string>
+    <string name="script_random_hint">点一下切换：顺序执行全部，或每轮随机抽一段</string>
     <string name="btn_add_manual">新建空白脚本</string>
     <string name="empty_scripts">还没有脚本。开启悬浮球后，点球 →「录制」，在屏幕上滑一次即可保存。</string>
 

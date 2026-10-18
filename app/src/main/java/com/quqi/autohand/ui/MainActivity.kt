@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        adapter = ScriptAdapter(emptyList(), null, ::select, ::rename, ::delete)
+        adapter = ScriptAdapter(emptyList(), null, ::select, ::rename, ::delete, ::toggleRandom)
         binding.scriptList.layoutManager = LinearLayoutManager(this)
         binding.scriptList.adapter = adapter
 
@@ -104,6 +104,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun select(script: Script) {
         Prefs.setSelected(this, script.id)
+        refresh()
+    }
+
+    /** 切换「每轮随机抽一段」：脚本里录了多段手势时，把它们当成一个合集随机抽。 */
+    private fun toggleRandom(script: Script) {
+        if (script.steps.size < 2) return
+        Prefs.setScriptRandomPick(this, script.id, !script.randomPick)
         refresh()
     }
 

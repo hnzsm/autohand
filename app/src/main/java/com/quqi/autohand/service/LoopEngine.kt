@@ -14,7 +14,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.random.Random
 
-/** 协程驱动的循环回放器：脚本内各段手势顺序执行，脚本之间按间隔和随机抖动等待。 */
+/** 协程驱动的循环回放器：默认按顺序执行脚本内各段手势，开了随机抽取则每轮只跑一段；脚本之间按间隔和随机抖动等待。 */
 class LoopEngine(service: AccessibilityService) {
 
     enum class State { IDLE, RUNNING, PAUSED }
@@ -65,9 +65,19 @@ class LoopEngine(service: AccessibilityService) {
         onChange?.invoke(state, round)
         job = scope.launch {
             var failures = 0
+            // 合集模式：steps 当成一堆可替换的动作，每轮只抽一段，且不连着抽同一段
+            val pickMode = script.randomPick && script.steps.size > 1
+            var lastIndex = -1
             while (isActiveGate()) {
                 awaitRunning()
-                for (step in script.steps) {
+                val steps = if (pickMode) {
+                    lastIndex = pickIndex(script.steps.size, lastIndex)
+                    Log.i(TAG, "第 ${round + 1} 轮随机抽中第 ${lastIndex + 1}/${script.steps.size} 段")
+                    listOf(script.steps[lastIndex])
+                } else {
+                    script.steps
+                }
+                for (step in steps) {
                     awaitRunning()
                     onStep?.invoke(step)
                     val budget = step.durationMs + TIMEOUT_SLACK
@@ -76,7 +86,8 @@ class LoopEngine(service: AccessibilityService) {
                         failures++
                         Log.w(TAG, "第 $failures 次手势未被系统接受")
                     }
-                    if (step.waitAfterMs > 0) sleepInterruptible(step.waitAfterMs)
+                    // 抽出来的那一段带着录制时的停顿没意义，轮间间隔统一控制节奏
+                    if (!pickMode && step.waitAfterMs > 0) sleepInterruptible(step.waitAfterMs)
                 }
                 round++
                 onChange?.invoke(state, round)
@@ -111,6 +122,14 @@ class LoopEngine(service: AccessibilityService) {
     }
 
     private fun isActiveGate(): Boolean = job?.isCancelled != true
+
+    /** 从 size 段里随机抽一段，避开上一次抽到的那个。 */
+    private fun pickIndex(size: Int, avoid: Int): Int {
+        if (size <= 1) return 0
+        if (avoid !in 0 until size) return Random.nextInt(size)
+        val i = Random.nextInt(size - 1)
+        return if (i >= avoid) i + 1 else i
+    }
 
     private suspend fun awaitRunning() {
         while (paused) {

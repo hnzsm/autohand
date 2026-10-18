@@ -28,6 +28,7 @@ class PanelController(private val service: AccessibilityService) {
         var onLoopDelta: (Int) -> Unit = {}
         var onGapDelta: (Int) -> Unit = {}
         var onJitterDelta: (Int) -> Unit = {}
+        var onRandomPick: () -> Unit = {}
         var onScriptDelta: (Int) -> Unit = {}
         var onClose: () -> Unit = {}
         var onOutsideTouch: () -> Unit = {}
@@ -88,7 +89,9 @@ class PanelController(private val service: AccessibilityService) {
         loops: Int,
         gapMs: Long,
         jitterMs: Long,
-        scriptCount: Int
+        scriptCount: Int,
+        randomPick: Boolean,
+        canRandom: Boolean
     ) {
         val b = binding ?: return
         b.panelScriptName.text = if (scriptCount == 0) "没有脚本" else "$scriptName（$scriptCount 个）"
@@ -106,7 +109,13 @@ class PanelController(private val service: AccessibilityService) {
         b.valueGap.text = if (gapMs <= 0) "无" else "${gapMs / 1000}s"
         b.valueJitter.text =
             if (jitterMs <= 0) "无" else String.format(java.util.Locale.US, "±%.1fs", jitterMs / 1000.0)
+        b.btnRandomPick.text = if (!canRandom) "—" else if (randomPick) "开" else "关"
+        b.btnRandomPick.alpha = if (canRandom) 1f else 0.4f
+        canRandomPick = canRandom
     }
+
+    /** 选中脚本至少两段手势时才能随机抽，避免开关点了没效果。 */
+    private var canRandomPick = false
 
     private fun bindEvents(b: ViewPanelBinding, l: Listener) {
         b.btnRecord.setOnClickListener { l.onRecord() }
@@ -127,6 +136,7 @@ class PanelController(private val service: AccessibilityService) {
         b.btnJitterPlus.setOnClickListener { if (!suppressClick) l.onJitterDelta(1) }
         bindHoldRepeat(b.btnJitterMinus) { l.onJitterDelta(-1) }
         bindHoldRepeat(b.btnJitterPlus) { l.onJitterDelta(1) }
+        b.btnRandomPick.setOnClickListener { if (canRandomPick) l.onRandomPick() }
         b.btnPrevScript.setOnClickListener { l.onScriptDelta(-1) }
         b.btnNextScript.setOnClickListener { l.onScriptDelta(1) }
         b.btnHidePanel.setOnClickListener { l.onClose() }
@@ -189,7 +199,7 @@ class PanelController(private val service: AccessibilityService) {
 
     private fun placeY(anchorY: Int): Int {
         val screen = Screens.size(service)
-        val height = dp(250f).toInt()
+        val height = dp(290f).toInt()
         return (anchorY - dp(30f)).toInt().coerceIn(0, (screen.y - height).coerceAtLeast(0))
     }
 

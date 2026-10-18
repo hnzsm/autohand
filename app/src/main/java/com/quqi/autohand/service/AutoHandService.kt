@@ -53,6 +53,7 @@ class AutoHandService : AccessibilityService() {
             )
             refreshUi()
         }
+        onRandomPick = { toggleRandomPick() }
         onScriptDelta = { delta -> stepScript(delta) }
         onClose = { panel?.close() }
         // 点面板外面（比如悬浮球）会先触发这里关闭；记下时刻，避免球的点击又把面板开回来
@@ -161,6 +162,14 @@ class AutoHandService : AccessibilityService() {
         refreshUi()
     }
 
+    /** 切换选中脚本的「每轮随机抽一段」；运行中改的要等重新开始才生效。 */
+    private fun toggleRandomPick() {
+        val script = Prefs.resolveSelected(this) ?: return
+        if (script.steps.size < 2) return
+        Prefs.setScriptRandomPick(this, script.id, !script.randomPick)
+        refreshUi()
+    }
+
     private fun startRecording() {
         panel?.close()
         recorder?.start(object : RecordController.Finish {
@@ -240,7 +249,9 @@ class AutoHandService : AccessibilityService() {
             loops = Prefs.loopCount(this),
             gapMs = gapMs(),
             jitterMs = jitterMs(),
-            scriptCount = Prefs.readScripts(this).size
+            scriptCount = Prefs.readScripts(this).size,
+            randomPick = script?.randomPick == true,
+            canRandom = (script?.steps?.size ?: 0) > 1
         )
     }
 
